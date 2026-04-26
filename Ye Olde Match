@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>The Olde Match | Архаизмы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0b1721;
+            background-image: radial-gradient(circle at 15% 30%, rgba(119, 46, 42, 0.18) 1.2%, transparent 1.2%);
+            background-size: 34px 34px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cormorant Garamond', 'Georgia', serif;
+            padding: 20px;
+        }
+
+        .game-card {
+            max-width: 950px;
+            width: 100%;
+            background: linear-gradient(135deg, #fefcf5 0%, #f6f2e8 100%);
+            border-radius: 16px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,245,0.6), 0 0 0 1px #2e2a24;
+            overflow: hidden;
+            padding: 20px 24px 40px;
+        }
+
+        .game-title {
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #1d2c3a;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #b17a54;
+            display: inline-block;
+            width: 100%;
+        }
+        .game-title span {
+            color: #772e2a;
+            font-style: italic;
+        }
+
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0 16px;
+            padding-bottom: 8px;
+        }
+        .mode-bar {
+            display: flex;
+            gap: 12px;
+        }
+        .mode-btn {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: #1d2c3a;
+            border: none;
+            padding: 6px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: #e9e0ce;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .mode-btn.active {
+            background: #772e2a;
+            color: #f2e9d0;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 6px rgba(119,46,42,0.4);
+        }
+
+        .stats-board {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 0 auto 20px auto;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            background: #1c2c2b;
+            padding: 8px 20px;
+            border-radius: 60px;
+            color: #ebddb8;
+            border: 1px solid #b17a54;
+            box-shadow: inset 0 0 0 1px #2f4a47, 0 3px 8px rgba(0,0,0,0.2);
+        }
+        .stat-card span:first-child {
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            display: block;
+        }
+        .stat-card span:last-child {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #c9a87b;
+            font-family: monospace;
+        }
+
+        .central-area {
+            background: #1f2b2a;
+            padding: 24px 16px;
+            text-align: center;
+            font-size: 2.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #f0e2c5;
+            font-family: 'Cormorant Garamond', serif;
+            border-top: 2px solid #862e2a;
+            border-bottom: 2px solid #862e2a;
+            margin: 12px 0 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            background: linear-gradient(145deg, #1a2728 0%, #142021 100%);
+            border-radius: 12px;
+            min-height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .central-word {
+            font-size: 2.7rem;
+            color: #f0e2c5;
+        }
+
+        .babadum-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin: 20px 0 20px;
+        }
+
+        .image-card {
+            background: #e9e2d2;
+            border-radius: 28px;
+            padding: 20px 16px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            border: 2px solid #a87b4f;
+            box-shadow: 0 6px 0 #5c3f28;
+        }
+        .image-card:hover:not(.disabled-card) {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 0 #5c3f28;
+            background: #f2ecdf;
+        }
+        .image-card:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 0 #5c3f28;
+        }
+        .visual-icon {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+            display: block;
+            color: #3b2a1f;
+        }
+        .image-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            color: #3b2a1f;
+            background: #fef7ea;
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 60px;
+            border: 1px solid #b39264;
+        }
+        .image-card.correct-highlight {
+            background: #2c5d46;
+            border-color: #cfae76;
+            transform: scale(0.98);
+        }
+        .image-card.correct-highlight .visual-icon,
+        .image-card.correct-highlight .image-label {
+            color: #faf0db;
+            background: #2c5d46;
+            border-color: #e6c894;
+        }
+        .image-card.wrong-highlight {
+            background: #772e2a;
+            border-color: #cd7f68;
+            transform: scale(0.98);
+        }
+        .image-card.wrong-highlight .visual-icon,
+        .image-card.wrong-highlight .image-label {
+            color: #ffe1d0;
+            background: #772e2a;
+            border-color: #e6b094;
+            text-decoration: line-through;
+        }
+        .disabled-card {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .explanation-box {
+            background: #1c2c2b;
+            border-left: 5px solid #c9a87b;
+            padding: 12px 16px;
+            margin: 15px 0 10px;
+            border-radius: 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: #e2cdab;
+            line-height: 1.4;
+        }
+
+        .next-area {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 20px;
+        }
+        .next-btn {
+            background: #772e2a;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 12px 32px;
+            border-radius: 40px;
+            color: #f5e9cd;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 70%;
+            max-width: 260px;
+            box-shadow: 0 5px 0 #411b18;
+        }
+        .next-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #411b18;
+        }
+
+        .result {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 0.9rem;
+            text-align: center;
+            background: #1c2c2b;
+            padding: 12px;
+            border-radius: 40px;
+            color: #e2cdab;
+            border-left: 3px solid #772e2a;
+            border-right: 3px solid #772e2a;
+            margin-top: 10px;
+        }
+        footer {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 20px;
+            color: #5e5542;
+        }
+        @media (max-width: 650px) {
+            .game-card { padding: 16px 16px 30px; }
+            .central-word { font-size: 1.8rem; }
+            .visual-icon { font-size: 2.5rem; }
+            .image-label { font-size: 0.7rem; padding: 3px 8px; }
+            .babadum-grid { gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-card">
+    <div class="game-title">THE OLDE MATCH <span>✦</span> ARCHAIC WORDS</div>
+    <div class="top-bar">
+        <div class="mode-bar">
+            <button class="mode-btn" data-mode="british">🇬🇧 British</button>
+            <button class="mode-btn" data-mode="american">🇺🇸 American</button>
+        </div>
+    </div>
+    
+    <div class="stats-board">
+        <div class="stat-card">
+            <span>🏆 ОЧКИ</span>
+            <span id="scoreDisplay">0</span>
+        </div>
+        <div class="stat-card">
+            <span>✨ БОНУСЫ</span>
+            <span id="bonusDisplay">0</span>
+        </div>
+    </div>
+    
+    <div class="central-area" id="centralArea"></div>
+    <div class="babadum-grid" id="optionsGrid"></div>
+    <div class="explanation-box" id="explanationBox">⟨ выберите вариант — здесь появится пояснение ⟩</div>
+    <div class="next-area"><button class="next-btn" id="nextBtn">Следующее</button></div>
+    <div class="result" id="resultMessage"></div>
+    <footer>✧ 3 верных ответа = +1 бонус · ошибка = −1 бонус ✧</footer>
+</div>
+
+<script>
+    // ========== СЛОВАРИ ==========
+    const WORDS_DB = {
+        british: [
+            { archaic: "thou", modern: "ты" }, { archaic: "ye", modern: "вы" }, { archaic: "methinks", modern: "мне кажется" },
+            { archaic: "wherefore", modern: "зачем, почему" }, { archaic: "ere", modern: "до, прежде чем" }, { archaic: "betide", modern: "случаться" },
+            { archaic: "wight", modern: "существо, человек" }, { archaic: "behold", modern: "смотри, узри" }, { archaic: "forsooth", modern: "воистину" },
+            { archaic: "aye", modern: "да" }, { archaic: "nay", modern: "нет" }, { archaic: "hence", modern: "отсюда" },
+            { archaic: "thence", modern: "оттуда" }, { archaic: "whence", modern: "откуда" }, { archaic: "eke", modern: "также" },
+            { archaic: "aught", modern: "что-либо" }, { archaic: "naught", modern: "ничто" }, { archaic: "whilom", modern: "некогда" },
+            { archaic: "verily", modern: "поистине" }, { archaic: "fain", modern: "охотно" }, { archaic: "lief", modern: "охотно" },
+            { archaic: "lo", modern: "вот, смотри" }, { archaic: "troth", modern: "верность" }, { archaic: "gramercy", modern: "большое спасибо" },
+            { archaic: "mistress", modern: "госпожа" }, { archaic: "squire", modern: "сквайр, помещик" }, { archaic: "varlet", modern: "слуга, плут" },
+            { archaic: "churl", modern: "грубиян, простолюдин" }
+        ],
+        american: [
+            { archaic: "hussy", modern: "женщина, жена" }, { archaic: "furbelow", modern: "оборки на одежде" }, { archaic: "gumption", modern: "смекалка, здравый смысл" },
+            { archaic: "barker", modern: "зазывала на ярмарке" }, { archaic: "poke", modern: "мешок, карман" }, { archaic: "tote", modern: "носить, таскать" },
+            { archaic: "catawampus", modern: "кривой, перекошенный" }, { archaic: "slapdash", modern: "небрежно, наспех" }, { archaic: "hornswoggle", modern: "обманывать" },
+            { archaic: "discombobulate", modern: "сбивать с толку" }, { archaic: "taradiddle", modern: "маленькая ложь" }, { archaic: "kerfuffle", modern: "суматоха" },
+            { archaic: "lollygag", modern: "бездельничать" }, { archaic: "snollygoster", modern: "хитрый, беспринципный человек" }, { archaic: "cattywampus", modern: "перекошенный" },
+            { archaic: "blatherskite", modern: "болтун" }, { archaic: "gobbledygook", modern: "непонятная, запутанная речь" }, { archaic: "hullabaloo", modern: "шум, суматоха" },
+            { archaic: "razzmatazz", modern: "показуха, шик" }, { archaic: "skedaddle", modern: "убегать, удирать" }, { archaic: "flummox", modern: "смущать, сбивать с толку" },
+            { archaic: "abominable", modern: "отвратительный" }, { archaic: "jabberwocky", modern: "бессмыслица, чепуха" }, { archaic: "whippersnapper", modern: "мальчишка, сопляк" },
+            { archaic: "malarkey", modern: "ерунда, вздор" }, { archaic: "poppycock", modern: "чепуха, нелепость" }, { archaic: "scallywag", modern: "негодяй, проказник" },
+            { archaic: "nincompoop", modern: "глупец, простофиля" }, { archaic: "bamboozle", modern: "обманывать" }, { archaic: "dillydally", modern: "медлить, мешкать" },
+            { archaic: "fiddle-faddle", modern: "пустяки, ерунда" }, { archaic: "hanky-panky", modern: "шалости" }, { archaic: "hubbub", modern: "шум, гам" },
+            { archaic: "knickknack", modern: "безделушка" }, { archaic: "lickety-split", modern: "очень быстро" }, { archaic: "ragamuffin", modern: "оборванец" },
+            { archaic: "shilly-shally", modern: "колебаться" }, { archaic: "topsy-turvy", modern: "вверх дном" }, { archaic: "willy-nilly", modern: "волей-неволей" },
+            { archaic: "by jingo", modern: "восклицание удивления" }, { archaic: "jim-dandy", modern: "отличный" }, { archaic: "thingamajig", modern: "штуковина" },
+            { archaic: "whatnot", modern: "всякая всячина" }, { archaic: "yonder", modern: "вон там" }, { archaic: "zounds", modern: "восклицание удивления" }
+        ]
+    };
+
+    // Пояснения
+    function getExplanation(archaic, modern) {
+        const explanations = {
+            "thou": "Архаичная форма местоимения «ты».",
+            "ye": "Множественное число «вы», вежливая форма.",
+            "methinks": "«Мне думается», часто у Шекспира.",
+            "wherefore": "«Зачем? почему?» (не «где»).",
+            "ere": "«До того как», «прежде чем».",
+            "skedaddle": "Американский архаизм — быстро убегать.",
+            "gumption": "Смекалка, находчивость, здравый смысл.",
+            "discombobulate": "Сбивать с толку, приводить в замешательство.",
+        };
+        return explanations[archaic] || `«${archaic}» означает «${modern}». Слово вышло из употребления, но встречается в классике.`;
+    }
+
+    function getVisualForTranslation(translation) {
+        const map = {
+            "ты":"👤","вы":"👥","мне кажется":"🤔","зачем, почему":"❓","до, прежде чем":"⏳","случаться":"🎲","существо, человек":"🧝","смотри, узри":"👀","воистину":"✅","да":"👍","нет":"👎","отсюда":"➡️","оттуда":"⬅️","откуда":"🔍","также":"➕","что-либо":"📦","ничто":"🚫","некогда":"📜","поистине":"💎","охотно":"😊","вот, смотри":"👉","верность":"🤝","большое спасибо":"🙏","госпожа":"👸","сквайр, помещик":"🏰","слуга, плут":"🎭","грубиян, простолюдин":"👹","женщина, жена":"👩","оборки на одежде":"🎀","смекалка, здравый смысл":"💡","зазывала на ярмарке":"📢","мешок, карман":"👜","носить, таскать":"🎒","кривой, перекошенный":"🥴","небрежно, наспех":"⚡","обманывать":"🎭","сбивать с толку":"🌀","маленькая ложь":"🤥","суматоха":"🌪️","бездельничать":"🛋️","хитрый, беспринципный человек":"🦊","перекошенный":"😖","болтун":"🗣️","непонятная, запутанная речь":"🔤❓","шум, суматоха":"📢🌪️","показуха, шик":"✨","убегать, удирать":"🏃💨","смущать":"😵","отвратительный":"🤮","бессмыслица, чепуха":"🗑️","мальчишка, сопляк":"🧒","ерунда, вздор":"💩","чепуха, нелепость":"🎪","негодяй, проказник":"😈","глупец":"🤪","медлить":"🐢","пустяки":"🍃","шалости":"😏","шум, гам":"📣","безделушка":"🎁","очень быстро":"⚡","оборванец":"🥾","колебаться":"⚖️","вверх дном":"🔄","волей-неволей":"🎲","восклицание удивления":"😲","отличный":"🏆","штуковина":"🔧","всякая всячина":"📦","вон там":"🌄","удивление":"😲"
+        };
+        return map[translation] || "❓";
+    }
+
+    let currentDialect = "british";
+    let currentWordsList = [];
+    let currentIndex = 0;
+    let score = 0;
+    let bonus = 0;
+    let correctStreak = 0;      // счётчик правильных ответов подряд для бонуса
+    let answered = false;
+    let currentQuestion = null;
+    let currentOptions = [];
+
+    const centralArea = document.getElementById("centralArea");
+    const grid = document.getElementById("optionsGrid");
+    const scoreSpan = document.getElementById("scoreDisplay");
+    const bonusSpan = document.getElementById("bonusDisplay");
+    const nextBtn = document.getElementById("nextBtn");
+    const resultDiv = document.getElementById("resultMessage");
+    const explanationBox = document.getElementById("explanationBox");
+
+    function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    
+    function updateUI() {
+        scoreSpan.innerText = score;
+        bonusSpan.innerText = bonus;
+    }
+
+    function generateOptions(correctModern, fullList, exceptArchaic) {
+        let candidates = fullList.filter(item => item.modern !== correctModern && item.archaic !== exceptArchaic).map(item => item.modern);
+        candidates = [...new Set(candidates)];
+        while(candidates.length < 3) candidates.push("???");
+        return shuffle([correctModern, ...shuffle(candidates).slice(0, 3)]);
+    }
+
+    function renderCentral() {
+        centralArea.innerHTML = `<div class="central-word">${currentQuestion.archaic}</div>`;
+    }
+
+    function renderOptions() {
+        grid.innerHTML = "";
+        currentOptions.forEach(opt => {
+            const card = document.createElement("div");
+            card.className = "image-card";
+            const visual = document.createElement("div");
+            visual.className = "visual-icon";
+            visual.innerText = getVisualForTranslation(opt);
+            const label = document.createElement("div");
+            label.className = "image-label";
+            label.innerText = opt;
+            card.appendChild(visual);
+            card.appendChild(label);
+            card.addEventListener("click", () => handleAnswer(card, opt));
+            grid.appendChild(card);
+        });
+    }
+
+    function applyBonus() {
+        // Каждые 3 правильных ответа подряд дают +1 бонус
+        if (correctStreak > 0 && correctStreak % 3 === 0) {
+            bonus++;
+            resultDiv.innerHTML += `<br>✨ БОНУС! +1 (${correctStreak} верных подряд) ✨`;
+            updateUI();
+        }
+    }
+
+    function handleAnswer(card, selected) {
+        if (answered) return;
+        answered = true;
+        const isCorrect = (selected === currentQuestion.modern);
+        
+        if (isCorrect) {
+            score++;
+            correctStreak++;
+            resultDiv.innerHTML = "✓ Верно! +1 очко";
+            card.classList.add("correct-highlight");
+            applyBonus();  // проверяем, не накопилось ли 3 правильных
+        } else {
+            resultDiv.innerHTML = `✗ Ошибка. Правильно: «${currentQuestion.modern}».`;
+            card.classList.add("wrong-highlight");
+            // за ошибку вычитаем бонус (но не ниже нуля)
+            if (bonus > 0) {
+                bonus--;
+                resultDiv.innerHTML += `<br>⚠️ Бонус -1 ⚠️`;
+            }
+            correctStreak = 0;  // сбрасываем серию
+            for (let c of grid.children) {
+                if (c.querySelector(".image-label").innerText === currentQuestion.modern) {
+                    c.classList.add("correct-highlight");
+                }
+            }
+        }
+        
+        const expl = getExplanation(currentQuestion.archaic, currentQuestion.modern);
+        explanationBox.innerHTML = `📖 <strong>«${currentQuestion.archaic}»</strong> — ${currentQuestion.modern}.<br> ${expl}`;
+        
+        for (let c of grid.children) c.classList.add("disabled-card");
+        updateUI();
+        nextBtn.disabled = false; 
+        nextBtn.style.opacity = "1";
+    }
+
+    function loadQuestion() {
+        // Бесконечная игра: когда слова заканчиваются — перемешиваем заново
+        if (currentIndex >= currentWordsList.length) {
+            currentWordsList = shuffle([...(currentDialect === "british" ? WORDS_DB.british : WORDS_DB.american)]);
+            currentIndex = 0;
+        }
+        
+        answered = false;
+        currentQuestion = currentWordsList[currentIndex];
+        currentOptions = generateOptions(currentQuestion.modern, currentWordsList, currentQuestion.archaic);
+        renderCentral();
+        renderOptions();
+        nextBtn.disabled = true; 
+        nextBtn.style.opacity = "0.5";
+        resultDiv.innerHTML = "⟨ выберите вариант ⟩";
+        explanationBox.innerHTML = "⟨ выберите вариант — здесь появится пояснение ⟩";
+    }
+
+    function nextWord() {
+        if (!answered && currentIndex < currentWordsList.length) { 
+            resultDiv.innerHTML = "⟨ сначала выберите ⟩"; 
+            return; 
+        }
+        currentIndex++;
+        loadQuestion();
+    }
+
+    function resetGame() {
+        currentWordsList = shuffle([...(currentDialect === "british" ? WORDS_DB.british : WORDS_DB.american)]);
+        currentIndex = 0;
+        score = 0;
+        bonus = 0;
+        correctStreak = 0;
+        answered = false;
+        updateUI();
+        loadQuestion();
+    }
+
+    function switchDialect(dialect) {
+        currentDialect = dialect;
+        resetGame();
+        document.querySelectorAll(".mode-btn").forEach(btn => {
+            if (btn.getAttribute("data-mode") === dialect) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+        resultDiv.innerHTML = `🎻 Диалект: ${dialect === "british" ? "британский" : "американский"}`;
+    }
+
+    function init() {
+        switchDialect("british");
+        document.querySelectorAll(".mode-btn").forEach(btn => btn.addEventListener("click", () => switchDialect(btn.getAttribute("data-mode"))));
+        nextBtn.addEventListener("click", nextWord);
+    }
+    init();
+</script>
+</body>
+</html>
